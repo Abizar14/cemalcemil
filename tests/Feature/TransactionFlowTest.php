@@ -298,4 +298,60 @@ class TransactionFlowTest extends TestCase
         $response->assertSessionHasErrors('items');
         $this->assertDatabaseCount('transactions', 0);
     }
+
+    /**
+     * Transaction history defaults to today's data and can filter by a chosen date.
+     */
+    public function test_transaction_history_can_filter_by_transaction_date(): void
+    {
+        $user = User::factory()->admin()->create();
+        $shift = CashierShift::create([
+            'user_id' => $user->id,
+            'opened_at' => now()->startOfDay(),
+            'opening_cash' => 50000,
+            'status' => 'open',
+        ]);
+
+        $todayTransaction = Transaction::create([
+            'user_id' => $user->id,
+            'shift_id' => $shift->id,
+            'invoice_number' => 'TRX-TODAY-0001',
+            'transaction_date' => now(),
+            'payment_method' => 'cash',
+            'subtotal' => 10000,
+            'total_amount' => 10000,
+            'paid_amount' => 10000,
+            'change_amount' => 0,
+            'payment_status' => 'paid',
+            'transaction_status' => 'completed',
+        ]);
+
+        $yesterdayTransaction = Transaction::create([
+            'user_id' => $user->id,
+            'shift_id' => $shift->id,
+            'invoice_number' => 'TRX-YESTERDAY-0001',
+            'transaction_date' => now()->subDay(),
+            'payment_method' => 'cash',
+            'subtotal' => 15000,
+            'total_amount' => 15000,
+            'paid_amount' => 20000,
+            'change_amount' => 5000,
+            'payment_status' => 'paid',
+            'transaction_status' => 'completed',
+        ]);
+
+        $todayResponse = $this->actingAs($user)->get(route('transactions.index'));
+
+        $todayResponse->assertOk();
+        $todayResponse->assertSee($todayTransaction->invoice_number);
+        $todayResponse->assertDontSee($yesterdayTransaction->invoice_number);
+
+        $yesterdayResponse = $this->actingAs($user)->get(route('transactions.index', [
+            'transaction_date' => now()->subDay()->toDateString(),
+        ]));
+
+        $yesterdayResponse->assertOk();
+        $yesterdayResponse->assertSee($yesterdayTransaction->invoice_number);
+        $yesterdayResponse->assertDontSee($todayTransaction->invoice_number);
+    }
 }

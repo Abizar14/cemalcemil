@@ -23,6 +23,10 @@ class TransactionController extends Controller
         $paymentMethod = (string) $request->string('payment_method');
         $paymentStatus = (string) $request->string('payment_status');
         $transactionStatus = (string) $request->string('transaction_status');
+        $allDates = $request->boolean('all_dates');
+        $transactionDate = $allDates
+            ? ''
+            : $this->normalizeTransactionDateFilter((string) $request->string('transaction_date'));
 
         $transactions = Transaction::query()
             ->with(['user', 'shift'])
@@ -39,6 +43,9 @@ class TransactionController extends Controller
             ->when(in_array($transactionStatus, ['completed', 'cancelled'], true), function ($query) use ($transactionStatus) {
                 $query->where('transaction_status', $transactionStatus);
             })
+            ->when(! $allDates && $transactionDate !== '', function ($query) use ($transactionDate) {
+                $query->whereDate('transaction_date', $transactionDate);
+            })
             ->orderByDesc('transaction_date')
             ->paginate(10)
             ->withQueryString();
@@ -49,6 +56,8 @@ class TransactionController extends Controller
             'paymentMethod' => $paymentMethod,
             'paymentStatus' => $paymentStatus,
             'transactionStatus' => $transactionStatus,
+            'transactionDate' => $transactionDate,
+            'allDates' => $allDates,
         ]);
     }
 
@@ -511,5 +520,23 @@ class TransactionController extends Controller
             'cash_out' => $cashOut,
             'expected_closing_cash' => (float) $shift->opening_cash + $cashSales + $cashIn - $cashOut,
         ];
+    }
+
+    /**
+     * Normalize the selected transaction date, defaulting to today.
+     */
+    protected function normalizeTransactionDateFilter(string $date): string
+    {
+        if ($date === '') {
+            return now()->toDateString();
+        }
+
+        $parsed = \DateTime::createFromFormat('Y-m-d', $date);
+
+        if (! $parsed || $parsed->format('Y-m-d') !== $date) {
+            return now()->toDateString();
+        }
+
+        return $date;
     }
 }

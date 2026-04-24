@@ -25,7 +25,7 @@
     @endif
 
     <section class="mesh-panel shadow-panel animate-rise rounded-[1.75rem] border border-white/70 p-5 sm:p-6">
-        <form method="GET" action="{{ route('transactions.index') }}" class="grid gap-4 xl:grid-cols-[1.1fr_0.75fr_0.75fr_0.9fr_auto]">
+        <form method="GET" action="{{ route('transactions.index') }}" class="grid gap-4 xl:grid-cols-[1.05fr_0.78fr_0.78fr_0.9fr_0.9fr_auto]">
             <div>
                 <label for="search" class="mb-2 block text-sm font-medium text-slate-700">Cari invoice</label>
                 <input
@@ -78,6 +78,31 @@
                 </select>
             </div>
 
+            <div class="space-y-3">
+                <div>
+                    <label for="transaction_date" class="mb-2 block text-sm font-medium text-slate-700">Tanggal transaksi</label>
+                    <input
+                        id="transaction_date"
+                        type="date"
+                        name="transaction_date"
+                        value="{{ $allDates ? '' : $transactionDate }}"
+                        class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+                        {{ $allDates ? 'disabled' : '' }}
+                    >
+                </div>
+
+                <label class="inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm font-medium text-slate-700">
+                    <input
+                        type="checkbox"
+                        name="all_dates"
+                        value="1"
+                        @checked($allDates)
+                        class="h-4 w-4 rounded border-slate-300 text-orange-500 focus:ring-orange-400"
+                    >
+                    Semua tanggal
+                </label>
+            </div>
+
             <div class="flex items-end gap-3">
                 <button
                     type="submit"
@@ -100,6 +125,9 @@
             <div>
                 <p class="text-sm font-medium tracking-[0.2em] text-slate-500 uppercase">Riwayat Transaksi</p>
                 <h2 class="font-display mt-2 text-2xl font-semibold text-slate-900">Penjualan terbaru booth</h2>
+                <p class="mt-2 text-sm text-slate-500">
+                    {{ $allDates ? 'Menampilkan semua tanggal transaksi.' : 'Menampilkan transaksi pada ' . \Carbon\Carbon::parse($transactionDate)->translatedFormat('d M Y') . '.' }}
+                </p>
             </div>
             <div class="rounded-full bg-white/80 px-4 py-2 text-sm text-slate-600">
                 {{ $transactions->total() }} transaksi
