@@ -1,0 +1,82 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Category;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class ManagementCrudTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /**
+     * Authenticated users can create a category.
+     */
+    public function test_authenticated_user_can_create_category(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $response = $this->actingAs($user)->post(route('categories.store'), [
+            'name' => 'Frozen Drinks',
+            'description' => 'Kategori minuman dingin.',
+        ]);
+
+        $response->assertRedirect(route('categories.index'));
+
+        $this->assertDatabaseHas('categories', [
+            'name' => 'Frozen Drinks',
+        ]);
+    }
+
+    /**
+     * Authenticated users can create a product.
+     */
+    public function test_authenticated_user_can_create_product(): void
+    {
+        $user = User::factory()->admin()->create();
+        $category = Category::create([
+            'name' => 'Minuman Segar',
+            'description' => 'Kategori untuk minuman segar.',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('products.store'), [
+            'category_id' => $category->id,
+            'name' => 'Thai Tea',
+            'price' => 12000,
+            'is_active' => 1,
+        ]);
+
+        $response->assertRedirect(route('products.index'));
+
+        $this->assertDatabaseHas('products', [
+            'name' => 'Thai Tea',
+            'category_id' => $category->id,
+        ]);
+    }
+
+    /**
+     * Authenticated users can create a cash flow record.
+     */
+    public function test_authenticated_user_can_create_cash_flow(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $response = $this->actingAs($user)->post(route('cash-flows.store'), [
+            'flow_date' => now()->format('Y-m-d H:i:s'),
+            'type' => 'in',
+            'amount' => 150000,
+            'source' => 'Modal tambahan',
+            'description' => 'Tambahan modal operasional.',
+        ]);
+
+        $response->assertRedirect(route('cash-flows.index'));
+
+        $this->assertDatabaseHas('cash_flows', [
+            'user_id' => $user->id,
+            'type' => 'in',
+            'amount' => 150000,
+        ]);
+    }
+}

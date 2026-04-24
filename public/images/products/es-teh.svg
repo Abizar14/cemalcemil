@@ -1,0 +1,13 @@
+<svg width="640" height="480" viewBox="0 0 640 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="480" rx="36" fill="#FFF3E6"/>
+  <circle cx="509" cy="107" r="82" fill="#FFD7A8"/>
+  <circle cx="114" cy="366" r="92" fill="#FFE7C7"/>
+  <rect x="229" y="106" width="182" height="230" rx="28" fill="#F4FAFF" stroke="#E3EEF8" stroke-width="8"/>
+  <path d="M248 191C248 164.49 269.49 143 296 143H344C370.51 143 392 164.49 392 191V246C392 284.66 360.66 316 322 316H318C279.34 316 248 284.66 248 246V191Z" fill="#B86B3D"/>
+  <path d="M250 175H390" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+  <path d="M275 106V65" stroke="#7ED957" stroke-width="10" stroke-linecap="round"/>
+  <path d="M320 106V52" stroke="#7ED957" stroke-width="10" stroke-linecap="round"/>
+  <path d="M365 106V73" stroke="#7ED957" stroke-width="10" stroke-linecap="round"/>
+  <path d="M401 165C429 165 452 188 452 216C452 244 429 267 401 267" stroke="#F4FAFF" stroke-width="10" stroke-linecap="round"/>
+  <text x="320" y="399" text-anchor="middle" fill="#8F4A21" font-size="40" font-family="Verdana, Arial, sans-serif" font-weight="700">ES TEH</text>
+</svg>

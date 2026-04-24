@@ -1,0 +1,14 @@
+<svg width="640" height="480" viewBox="0 0 640 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="480" rx="36" fill="#FFF0ED"/>
+  <circle cx="514" cy="106" r="82" fill="#FFD3C7"/>
+  <circle cx="136" cy="366" r="94" fill="#FFE7E0"/>
+  <rect x="173" y="181" width="294" height="24" rx="12" fill="#C68B52"/>
+  <rect x="173" y="266" width="294" height="24" rx="12" fill="#C68B52"/>
+  <rect x="203" y="152" width="240" height="62" rx="31" fill="#D95C42"/>
+  <rect x="203" y="237" width="240" height="62" rx="31" fill="#E36A47"/>
+  <path d="M227 168H420" stroke="#F59C7B" stroke-width="8" stroke-linecap="round"/>
+  <path d="M227 253H420" stroke="#F8AC91" stroke-width="8" stroke-linecap="round"/>
+  <path d="M467 152C492 180 492 214 467 244" stroke="#FF8E3C" stroke-width="14" stroke-linecap="round"/>
+  <path d="M467 237C493 266 493 299 467 327" stroke="#FFB067" stroke-width="14" stroke-linecap="round"/>
+  <text x="320" y="399" text-anchor="middle" fill="#973B25" font-size="36" font-family="Verdana, Arial, sans-serif" font-weight="700">SOSIS BAKAR</text>
+</svg>

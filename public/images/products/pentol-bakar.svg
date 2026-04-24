@@ -1,0 +1,23 @@
+<svg width="640" height="480" viewBox="0 0 640 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="480" rx="36" fill="#FFF4ED"/>
+  <circle cx="515" cy="110" r="84" fill="#FFD8BF"/>
+  <circle cx="136" cy="370" r="92" fill="#FFE9D8"/>
+  <rect x="161" y="164" width="318" height="18" rx="9" fill="#C58B4E"/>
+  <rect x="161" y="228" width="318" height="18" rx="9" fill="#C58B4E"/>
+  <rect x="161" y="292" width="318" height="18" rx="9" fill="#C58B4E"/>
+  <circle cx="216" cy="173" r="34" fill="#B85C38"/>
+  <circle cx="278" cy="173" r="34" fill="#D77440"/>
+  <circle cx="341" cy="173" r="34" fill="#A8482C"/>
+  <circle cx="404" cy="173" r="34" fill="#CB6433"/>
+  <circle cx="216" cy="237" r="34" fill="#D77440"/>
+  <circle cx="278" cy="237" r="34" fill="#A8482C"/>
+  <circle cx="341" cy="237" r="34" fill="#CB6433"/>
+  <circle cx="404" cy="237" r="34" fill="#B85C38"/>
+  <circle cx="216" cy="301" r="34" fill="#A8482C"/>
+  <circle cx="278" cy="301" r="34" fill="#CB6433"/>
+  <circle cx="341" cy="301" r="34" fill="#B85C38"/>
+  <circle cx="404" cy="301" r="34" fill="#D77440"/>
+  <path d="M475 157C499 182 499 222 475 248" stroke="#FF8E3C" stroke-width="14" stroke-linecap="round"/>
+  <path d="M475 221C503 247 503 287 475 313" stroke="#FFB067" stroke-width="14" stroke-linecap="round"/>
+  <text x="320" y="402" text-anchor="middle" fill="#8F3C20" font-size="36" font-family="Verdana, Arial, sans-serif" font-weight="700">PENTOL BAKAR</text>
+</svg>

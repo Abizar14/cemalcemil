@@ -1,0 +1,12 @@
+<svg width="640" height="480" viewBox="0 0 640 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="480" rx="36" fill="#FFF7E8"/>
+  <circle cx="515" cy="108" r="82" fill="#FFE1A4"/>
+  <circle cx="135" cy="366" r="92" fill="#FFF0C9"/>
+  <path d="M215 322C215 249 262 168 320 168C378 168 425 249 425 322H215Z" fill="#E54B4B"/>
+  <path d="M244 170H396L380 130H260L244 170Z" fill="#F15C59"/>
+  <path d="M241 232C241 206.042 262.042 185 288 185H352C377.958 185 399 206.042 399 232V322H241V232Z" fill="#F2C94C"/>
+  <path d="M276 206C294 216 301 245 289 263C277 281 246 284 228 271C210 258 210 230 228 217C242 207 261 205 276 206Z" fill="#FFE08A"/>
+  <path d="M375 214C394 225 401 254 389 271C377 288 346 291 328 279C309 267 310 237 328 225C341 216 358 213 375 214Z" fill="#FFD96F"/>
+  <path d="M333 248C354 260 362 291 348 310C334 329 301 332 281 318C261 305 262 274 281 261C295 252 315 248 333 248Z" fill="#FFE08A"/>
+  <text x="320" y="400" text-anchor="middle" fill="#A05C00" font-size="33" font-family="Verdana, Arial, sans-serif" font-weight="700">KERIPIK KENTANG</text>
+</svg>
