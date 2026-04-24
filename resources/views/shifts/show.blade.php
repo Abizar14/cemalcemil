@@ -24,16 +24,17 @@
             <p class="font-display mt-3 text-3xl font-semibold text-slate-900">Rp{{ number_format($shift->opening_cash, 0, ',', '.') }}</p>
         </article>
         <article class="mesh-panel shadow-panel rounded-[1.75rem] border border-white/70 p-5">
+            <p class="text-sm text-slate-500">Total penjualan</p>
+            <p class="font-display mt-3 text-3xl font-semibold text-slate-900">Rp{{ number_format($summary['total_sales'], 0, ',', '.') }}</p>
+            <p class="mt-2 text-xs leading-5 text-slate-500">Gabungan semua transaksi selesai: cash + QRIS.</p>
+        </article>
+        <article class="mesh-panel shadow-panel rounded-[1.75rem] border border-white/70 p-5">
             <p class="text-sm text-slate-500">Cash sales</p>
             <p class="font-display mt-3 text-3xl font-semibold text-emerald-700">Rp{{ number_format($summary['cash_sales'], 0, ',', '.') }}</p>
         </article>
         <article class="mesh-panel shadow-panel rounded-[1.75rem] border border-white/70 p-5">
             <p class="text-sm text-slate-500">QRIS sales</p>
             <p class="font-display mt-3 text-3xl font-semibold text-sky-700">Rp{{ number_format($summary['qris_sales'], 0, ',', '.') }}</p>
-        </article>
-        <article class="mesh-panel shadow-panel rounded-[1.75rem] border border-white/70 p-5">
-            <p class="text-sm text-slate-500">Estimasi tutup</p>
-            <p class="font-display mt-3 text-3xl font-semibold text-slate-900">Rp{{ number_format($summary['expected_closing_cash'], 0, ',', '.') }}</p>
         </article>
     </section>
 
@@ -56,15 +57,24 @@
                     <p class="text-sm text-slate-500">Kas keluar</p>
                     <p class="font-display mt-2 text-xl font-semibold text-rose-600">Rp{{ number_format($summary['cash_out'], 0, ',', '.') }}</p>
                 </div>
+                <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-4 sm:col-span-2">
+                    <p class="text-sm text-slate-500">Estimasi kas sistem saat tutup</p>
+                    <p class="font-display mt-2 text-xl font-semibold text-slate-900">Rp{{ number_format($summary['expected_closing_cash'], 0, ',', '.') }}</p>
+                    <p class="mt-2 text-xs leading-5 text-slate-500">
+                        Dihitung dari modal awal + penjualan cash + kas masuk - kas keluar.
+                    </p>
+                </div>
                 <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-4">
-                    <p class="text-sm text-slate-500">Kas aktual</p>
+                    <p class="text-sm text-slate-500">Kas aktual saat tutup</p>
                     <p class="font-display mt-2 text-xl font-semibold text-slate-900">Rp{{ number_format($shift->closing_cash_actual ?? 0, 0, ',', '.') }}</p>
+                    <p class="mt-2 text-xs leading-5 text-slate-500">Jumlah uang tunai fisik yang benar-benar ada di laci saat dihitung manual.</p>
                 </div>
                 <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-4">
                     <p class="text-sm text-slate-500">Selisih</p>
                     <p class="font-display mt-2 text-xl font-semibold {{ ($shift->cash_difference ?? 0) < 0 ? 'text-rose-600' : 'text-slate-900' }}">
                         Rp{{ number_format($shift->cash_difference ?? 0, 0, ',', '.') }}
                     </p>
+                    <p class="mt-2 text-xs leading-5 text-slate-500">Hasil kas aktual dikurangi estimasi kas sistem.</p>
                 </div>
             </div>
 
