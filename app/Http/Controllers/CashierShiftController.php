@@ -140,6 +140,7 @@ class CashierShiftController extends Controller
             ->sum('total_amount');
         $cashIn = (float) $shift->cashFlows->where('type', 'in')->sum('amount');
         $cashOut = (float) $shift->cashFlows->where('type', 'out')->sum('amount');
+        $totalSales = $cashSales + $qrisSales;
         $expectedClosingCash = (float) $shift->opening_cash + $cashSales + $cashIn - $cashOut;
 
         return [
@@ -147,6 +148,7 @@ class CashierShiftController extends Controller
             'cancelled_count' => $shift->transactions->where('transaction_status', 'cancelled')->count(),
             'cash_sales' => $cashSales,
             'qris_sales' => $qrisSales,
+            'total_sales' => $totalSales,
             'pending_qris' => $pendingQris,
             'cash_in' => $cashIn,
             'cash_out' => $cashOut,

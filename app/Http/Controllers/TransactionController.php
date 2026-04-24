@@ -500,11 +500,13 @@ class TransactionController extends Controller
         $qrisSales = (float) $completedTransactions->where('payment_method', 'qris')->sum('total_amount');
         $cashIn = (float) $shift->cashFlows->where('type', 'in')->sum('amount');
         $cashOut = (float) $shift->cashFlows->where('type', 'out')->sum('amount');
+        $totalSales = $cashSales + $qrisSales;
 
         return [
             'transactions_count' => $completedTransactions->count(),
             'cash_sales' => $cashSales,
             'qris_sales' => $qrisSales,
+            'total_sales' => $totalSales,
             'cash_in' => $cashIn,
             'cash_out' => $cashOut,
             'expected_closing_cash' => (float) $shift->opening_cash + $cashSales + $cashIn - $cashOut,
