@@ -29,7 +29,7 @@
                 <img src="{{ asset($booth['logo']) }}" alt="Logo {{ $booth['name'] }}" class="logo">
                 <strong>{{ strtoupper($booth['name']) }}</strong><br>
                 <span class="small">{{ $booth['address'] }}, {{ $booth['city'] }}</span><br>
-                <span class="small">Telp: {{ $booth['phone'] }}</span>
+                <span class="small">No. Telp: {{ $booth['phone'] }}</span>
             </div>
 
             <div class="divider"></div>
