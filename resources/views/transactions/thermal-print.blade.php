@@ -21,6 +21,7 @@
     <body onload="window.print()">
         <div class="actions">
             <button type="button" onclick="window.print()">Print Lagi</button>
+            <a href="{{ route('transactions.create') }}">Transaksi Baru</a>
             <a href="{{ route('transactions.show', $transaction) }}">Kembali</a>
         </div>
 

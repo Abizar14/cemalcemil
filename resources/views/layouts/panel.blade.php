@@ -14,6 +14,7 @@
                 ['label' => 'Shift', 'route' => 'shifts.index'],
                 ['label' => 'Transaksi', 'route' => 'transactions.index'],
                 ['label' => 'Laporan', 'route' => 'reports.daily'],
+                ['label' => 'Booth', 'route' => 'booth-settings.edit'],
                 ['label' => 'Kategori', 'route' => 'categories.index'],
                 ['label' => 'Produk', 'route' => 'products.index'],
                 ['label' => 'Arus Kas', 'route' => 'cash-flows.index'],
@@ -25,65 +26,29 @@
         <div class="absolute left-10 top-8 h-72 w-72 rounded-full bg-orange-300/30 blur-3xl"></div>
         <div class="absolute right-0 top-24 h-80 w-80 rounded-full bg-amber-200/35 blur-3xl"></div>
 
-        <div class="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-            <div class="{{ $isKasirOnly ? 'space-y-6' : 'grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)]' }}">
+        <div class="relative mx-auto max-w-[1700px] px-3 py-6 sm:px-5 lg:px-6 xl:px-4 2xl:px-6 lg:py-8">
+            <div class="space-y-6 xl:space-y-0 {{ $isKasirOnly ? '' : 'xl:grid xl:gap-6 xl:grid-cols-[280px_minmax(0,1fr)]' }}">
                 @unless ($isKasirOnly)
-                <aside class="animate-rise xl:sticky xl:top-6 xl:self-start">
+                <details class="mesh-panel shadow-panel animate-rise overflow-hidden rounded-[1.75rem] border border-white/70 xl:hidden">
+                    <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-slate-800">
+                        <span class="flex items-center gap-3">
+                            <span class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl border border-white/80 bg-white/80 shadow-sm">
+                                <img src="{{ asset($booth['logo']) }}" alt="Logo {{ $booth['name'] }}" class="h-9 w-9 object-contain">
+                            </span>
+                            <span class="font-display text-base">{{ $booth['name'] }}</span>
+                        </span>
+                        <span class="rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white">
+                            Toggle
+                        </span>
+                    </summary>
+                    <div class="border-t border-white/70 p-5">
+                        @include('layouts.panel-sidebar-content')
+                    </div>
+                </details>
+
+                <aside class="animate-rise hidden xl:block xl:sticky xl:top-6 xl:self-start">
                     <div class="mesh-panel shadow-panel overflow-hidden rounded-[2rem] border border-white/70 p-5">
-                        <div class="rounded-[1.5rem] bg-slate-900 p-5 text-white">
-                            <div class="flex items-center gap-4">
-                                <div class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-[1.35rem] bg-white/10 ring-1 ring-white/10">
-                                    <img src="{{ asset($booth['logo']) }}" alt="Logo {{ $booth['name'] }}" class="h-14 w-14 object-contain">
-                                </div>
-                                <div>
-                                    <p class="text-xs font-semibold tracking-[0.22em] text-slate-300 uppercase">{{ $booth['name'] }}</p>
-                                    <p class="mt-1 text-xs text-slate-400">Panel operasional booth</p>
-                                </div>
-                            </div>
-                            <h1 class="font-display mt-3 text-2xl font-semibold">{{ $currentUser->name }}</h1>
-                            <p class="mt-2 text-sm text-slate-300">{{ $currentUser->email }}</p>
-                            <p class="mt-2 inline-flex rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase text-slate-200">
-                                {{ $currentUser->role }}
-                            </p>
-                        </div>
-
-                        <nav class="mt-5 space-y-2">
-                            @foreach ($menu as $item)
-                                @php
-                                    $isActive = request()->routeIs($item['route']) || request()->routeIs(str_replace('.index', '.*', $item['route']));
-                                @endphp
-                                <a
-                                    href="{{ route($item['route']) }}"
-                                    class="flex items-center justify-between rounded-[1.25rem] px-4 py-3 text-sm font-medium transition {{ $isActive ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20' : 'bg-white/70 text-slate-700 hover:bg-white' }}"
-                                >
-                                    <span>{{ $item['label'] }}</span>
-                                    <span class="text-xs {{ $isActive ? 'text-slate-300' : 'text-slate-400' }}">Open</span>
-                                </a>
-                            @endforeach
-                        </nav>
-
-                        <div class="mt-5 rounded-[1.5rem] border border-orange-100 bg-orange-50 p-4">
-                            <p class="text-xs font-semibold tracking-[0.18em] text-orange-700 uppercase">Akses Cepat</p>
-                            <div class="mt-3 space-y-2 text-sm">
-                                <a href="{{ route('transactions.create') }}" class="block rounded-xl bg-white px-4 py-3 text-slate-700 transition hover:bg-orange-100">
-                                    Buka kasir
-                                </a>
-                                @if ($currentUser->isAdmin())
-                                    <a href="{{ route('reports.daily') }}" class="block rounded-xl bg-white px-4 py-3 text-slate-700 transition hover:bg-orange-100">
-                                        Lihat laporan harian
-                                    </a>
-                                    <a href="{{ route('categories.create') }}" class="block rounded-xl bg-white px-4 py-3 text-slate-700 transition hover:bg-orange-100">
-                                        Tambah kategori baru
-                                    </a>
-                                    <a href="{{ route('products.create') }}" class="block rounded-xl bg-white px-4 py-3 text-slate-700 transition hover:bg-orange-100">
-                                        Tambah produk baru
-                                    </a>
-                                    <a href="{{ route('cash-flows.create') }}" class="block rounded-xl bg-white px-4 py-3 text-slate-700 transition hover:bg-orange-100">
-                                        Input arus kas
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
+                        @include('layouts.panel-sidebar-content')
                     </div>
                 </aside>
                 @endunless

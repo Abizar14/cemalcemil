@@ -95,7 +95,7 @@
                                 type="number"
                                 name="opening_cash"
                                 min="0"
-                                step="0.01"
+                                step="1"
                                 value="{{ old('opening_cash', '0') }}"
                                 class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
                                 placeholder="0"
@@ -176,6 +176,14 @@
                     Saat tutup shift, masukkan uang tunai aktual yang ada di laci. Sistem akan hitung selisih otomatis.
                 </p>
 
+                @if (($currentShiftSummary['pending_qris_count'] ?? 0) > 0)
+                    <div class="mt-5 rounded-[1.5rem] border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                        Masih ada {{ $currentShiftSummary['pending_qris_count'] }} transaksi QRIS pending senilai
+                        <span class="font-semibold">Rp{{ number_format($currentShiftSummary['pending_qris'], 0, ',', '.') }}</span>.
+                        Konfirmasi dulu pembayaran QRIS sebelum shift ditutup.
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ route('shifts.close') }}" class="mt-5 space-y-4">
                     @csrf
                     @method('PATCH')
@@ -186,7 +194,7 @@
                             id="closing_cash_actual"
                             type="number"
                             min="0"
-                            step="0.01"
+                            step="1"
                             name="closing_cash_actual"
                             class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
                             placeholder="Masukkan uang tunai aktual"
@@ -206,7 +214,8 @@
 
                     <button
                         type="submit"
-                        class="w-full rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
+                        class="w-full rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
+                        @disabled(($currentShiftSummary['pending_qris_count'] ?? 0) > 0)
                     >
                         Tutup Shift Ini
                     </button>
@@ -314,8 +323,8 @@
                                                     </span>
                                                 @endif
                                                 @if ($product->track_stock)
-                                                    <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $product->isLowStock() ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
-                                                        Stok {{ $product->stock_quantity }}
+                                                    <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $product->isOutOfStock() ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700' }}">
+                                                        {{ $product->isOutOfStock() ? 'Stok Habis' : 'Stok Ada' }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -401,7 +410,7 @@
                             id="paid_amount"
                             type="number"
                             min="0"
-                            step="0.01"
+                            step="1"
                             name="paid_amount"
                             value="{{ old('paid_amount') }}"
                             class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
@@ -439,13 +448,26 @@
                         >{{ old('notes') }}</textarea>
                     </div>
 
-                    <button
-                        type="submit"
-                        id="submit-transaction-button"
-                        class="font-display mt-5 w-full rounded-2xl bg-slate-900 px-5 py-4 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-orange-600"
-                    >
-                        Simpan Transaksi
-                    </button>
+                    <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                        <button
+                            type="submit"
+                            name="submit_action"
+                            value="save"
+                            id="submit-transaction-button"
+                            class="font-display rounded-2xl bg-slate-900 px-5 py-4 text-base font-semibold text-white transition hover:-translate-y-0.5 hover:bg-orange-600"
+                        >
+                            Simpan Transaksi
+                        </button>
+                        <button
+                            type="submit"
+                            name="submit_action"
+                            value="print"
+                            id="submit-print-button"
+                            class="font-display rounded-2xl border border-orange-200 bg-orange-50 px-5 py-4 text-base font-semibold text-orange-700 transition hover:-translate-y-0.5 hover:bg-orange-100"
+                        >
+                            Simpan & Cetak
+                        </button>
+                    </div>
                     <p id="submit-helper-text" class="mt-3 text-sm text-slate-500">
                         Pilih produk dulu, lalu simpan transaksi saat keranjang sudah sesuai.
                     </p>
@@ -484,6 +506,7 @@
 
                 const formatRupiah = (value) => new Intl.NumberFormat('id-ID').format(Math.max(Number(value) || 0, 0));
                 const productGrid = document.getElementById('product-grid');
+                const cashierForm = document.getElementById('cashier-form');
                 const productSearch = document.getElementById('product-search');
                 const categoryFilter = document.getElementById('category-filter');
                 const groupFilter = document.getElementById('group-filter');
@@ -505,6 +528,7 @@
                 const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
                 const quickCashButtons = document.querySelectorAll('[data-quick-cash]');
                 const submitTransactionButton = document.getElementById('submit-transaction-button');
+                const submitPrintButton = document.getElementById('submit-print-button');
                 const submitHelperText = document.getElementById('submit-helper-text');
 
                 const findProduct = (productId) => productData.find((product) => product.id === productId);
@@ -588,9 +612,12 @@
                     submitTransactionButton.disabled = cart.size === 0;
                     submitTransactionButton.classList.toggle('cursor-not-allowed', cart.size === 0);
                     submitTransactionButton.classList.toggle('opacity-60', cart.size === 0);
+                    submitPrintButton.disabled = cart.size === 0;
+                    submitPrintButton.classList.toggle('cursor-not-allowed', cart.size === 0);
+                    submitPrintButton.classList.toggle('opacity-60', cart.size === 0);
                     submitHelperText.textContent = cart.size === 0
                         ? 'Pilih produk dulu, lalu simpan transaksi saat keranjang sudah sesuai.'
-                        : 'Kalau ada salah pilih, kamu bisa tambah, kurangi, hapus item, atau reset keranjang.';
+                        : 'Kalau ada salah pilih, kamu bisa tambah, kurangi, hapus item, reset keranjang, atau simpan langsung sambil cetak.';
                     updateChangePreview();
                 };
 
@@ -671,13 +698,49 @@
                     if (selectedMethod === 'cash') {
                         cashPaymentBox.classList.remove('hidden');
                         qrisPaymentBox.classList.add('hidden');
+                        paidAmountInput.required = true;
                     } else {
                         cashPaymentBox.classList.add('hidden');
                         qrisPaymentBox.classList.remove('hidden');
+                        paidAmountInput.required = false;
+                        paidAmountInput.setCustomValidity('');
                         paidAmountInput.value = '';
                     }
 
                     updateChangePreview();
+                };
+
+                const validateBeforeSubmit = () => {
+                    const selectedMethod = document.querySelector('input[name="payment_method"]:checked')?.value || 'cash';
+
+                    paidAmountInput.setCustomValidity('');
+
+                    if (cart.size === 0) {
+                        window.alert('Pilih minimal satu produk sebelum menyimpan transaksi.');
+                        return false;
+                    }
+
+                    if (selectedMethod !== 'cash') {
+                        return true;
+                    }
+
+                    const paidAmount = Number(paidAmountInput.value || 0);
+
+                    if (paidAmountInput.value === '' || paidAmount <= 0) {
+                        paidAmountInput.setCustomValidity('Nominal bayar wajib diisi untuk transaksi cash.');
+                        paidAmountInput.reportValidity();
+                        paidAmountInput.focus();
+                        return false;
+                    }
+
+                    if (paidAmount < currentTotalAmount) {
+                        paidAmountInput.setCustomValidity('Nominal bayar tidak boleh kurang dari total transaksi.');
+                        paidAmountInput.reportValidity();
+                        paidAmountInput.focus();
+                        return false;
+                    }
+
+                    return true;
                 };
 
                 const filterProducts = () => {
@@ -741,13 +804,21 @@
                 categoryFilter.addEventListener('change', filterProducts);
                 groupFilter.addEventListener('change', filterProducts);
                 unitFilter.addEventListener('change', filterProducts);
-                paidAmountInput.addEventListener('input', updateChangePreview);
+                paidAmountInput.addEventListener('input', () => {
+                    paidAmountInput.setCustomValidity('');
+                    updateChangePreview();
+                });
                 paymentRadios.forEach((radio) => radio.addEventListener('change', syncPaymentMode));
                 groupChips.forEach((chip) => {
                     chip.addEventListener('click', () => {
                         groupFilter.value = chip.dataset.groupChip;
                         filterProducts();
                     });
+                });
+                cashierForm.addEventListener('submit', (event) => {
+                    if (!validateBeforeSubmit()) {
+                        event.preventDefault();
+                    }
                 });
 
                 document.addEventListener('keydown', (event) => {

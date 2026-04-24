@@ -158,11 +158,8 @@
                                 </p>
                                 @if ($product->track_stock)
                                     <div class="mt-3 flex flex-wrap gap-2">
-                                        <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $product->isLowStock() ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700' }}">
-                                            Stok: {{ $product->stock_quantity }}
-                                        </span>
-                                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                                            Alert: {{ $product->stock_alert_threshold }}
+                                        <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $product->isOutOfStock() ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700' }}">
+                                            {{ $product->isOutOfStock() ? 'Stok Habis' : 'Stok Ada' }}
                                         </span>
                                     </div>
                                 @endif

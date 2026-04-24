@@ -99,6 +99,12 @@ class TransactionController extends Controller
             return $transaction;
         });
 
+        if ((string) $request->input('submit_action') === 'print') {
+            return redirect()
+                ->route('transactions.thermal-print', $transaction)
+                ->with('status', 'Transaksi berhasil disimpan dan siap dicetak thermal.');
+        }
+
         return redirect()
             ->route('transactions.show', $transaction)
             ->with('status', 'Transaksi berhasil disimpan.');
@@ -507,6 +513,14 @@ class TransactionController extends Controller
         $completedTransactions = $shift->transactions->where('transaction_status', 'completed');
         $cashSales = (float) $completedTransactions->where('payment_method', 'cash')->sum('total_amount');
         $qrisSales = (float) $completedTransactions->where('payment_method', 'qris')->sum('total_amount');
+        $pendingQris = (float) $completedTransactions
+            ->where('payment_method', 'qris')
+            ->where('payment_status', 'pending')
+            ->sum('total_amount');
+        $pendingQrisCount = $completedTransactions
+            ->where('payment_method', 'qris')
+            ->where('payment_status', 'pending')
+            ->count();
         $cashIn = (float) $shift->cashFlows->where('type', 'in')->sum('amount');
         $cashOut = (float) $shift->cashFlows->where('type', 'out')->sum('amount');
         $totalSales = $cashSales + $qrisSales;
@@ -516,6 +530,8 @@ class TransactionController extends Controller
             'cash_sales' => $cashSales,
             'qris_sales' => $qrisSales,
             'total_sales' => $totalSales,
+            'pending_qris_count' => $pendingQrisCount,
+            'pending_qris' => $pendingQris,
             'cash_in' => $cashIn,
             'cash_out' => $cashOut,
             'expected_closing_cash' => (float) $shift->opening_cash + $cashSales + $cashIn - $cashOut,

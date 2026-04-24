@@ -135,8 +135,10 @@
                                 <p class="mt-1 text-sm text-slate-500">{{ $product->category->name }}</p>
                             </div>
                             <div class="text-right">
-                                <p class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Stok {{ $product->stock_quantity }}</p>
-                                <p class="mt-2 text-xs text-slate-500">Batas alert {{ $product->stock_alert_threshold }}</p>
+                                <p class="rounded-full px-3 py-1 text-xs font-semibold {{ $product->isOutOfStock() ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700' }}">
+                                    {{ $product->isOutOfStock() ? 'Stok Habis' : 'Stok Ada' }}
+                                </p>
+                                <p class="mt-2 text-xs text-slate-500">Perlu dicek ulang dari stok internal.</p>
                             </div>
                         </div>
                     </div>

@@ -68,6 +68,47 @@ class TransactionFlowTest extends TestCase
     }
 
     /**
+     * Cash transactions can be saved and redirected directly to print.
+     */
+    public function test_cash_transaction_can_be_saved_and_printed(): void
+    {
+        $user = User::factory()->cashier()->create();
+        CashierShift::create([
+            'user_id' => $user->id,
+            'opened_at' => now(),
+            'opening_cash' => 50000,
+            'status' => 'open',
+        ]);
+        $category = Category::create([
+            'name' => 'Snack',
+            'description' => 'Kategori snack.',
+        ]);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Pisang Keju',
+            'price' => 12000,
+            'is_active' => true,
+            'track_stock' => true,
+            'stock_quantity' => 8,
+            'stock_alert_threshold' => 2,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('transactions.store'), [
+            'payment_method' => 'cash',
+            'paid_amount' => 20000,
+            'submit_action' => 'print',
+            'items' => [
+                ['product_id' => $product->id, 'qty' => 1],
+            ],
+        ]);
+
+        $transaction = Transaction::query()->latest('id')->first();
+
+        $this->assertNotNull($transaction);
+        $response->assertRedirect(route('transactions.thermal-print', $transaction));
+    }
+
+    /**
      * Pending QRIS transactions can be confirmed.
      */
     public function test_pending_qris_transaction_can_be_confirmed(): void

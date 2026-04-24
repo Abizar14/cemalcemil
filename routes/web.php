@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\BoothSettingController;
 use App\Http\Controllers\CashFlowController;
 use App\Http\Controllers\CashierShiftController;
 use App\Http\Controllers\CategoryController;
@@ -34,10 +35,13 @@ Route::middleware('auth')->group(function () {
         Route::resource('categories', CategoryController::class)->except('show');
         Route::resource('products', ProductController::class)->except('show');
         Route::resource('cash-flows', CashFlowController::class)->except('show');
+        Route::get('booth-settings', [BoothSettingController::class, 'edit'])->name('booth-settings.edit');
+        Route::put('booth-settings', [BoothSettingController::class, 'update'])->name('booth-settings.update');
         Route::get('reports/daily', DailyReportController::class)->name('reports.daily');
         Route::get('reports/daily/pdf', [DailyReportController::class, 'pdf'])->name('reports.daily.pdf');
         Route::get('backups/database', [BackupController::class, 'download'])->name('backups.database');
         Route::get('shifts', [CashierShiftController::class, 'index'])->name('shifts.index');
+        Route::patch('shifts/{shift}', [CashierShiftController::class, 'update'])->name('shifts.update');
         Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
         Route::get('transactions/{transaction}/edit', [TransactionController::class, 'edit'])->name('transactions.edit');
         Route::put('transactions/{transaction}', [TransactionController::class, 'update'])->name('transactions.update');

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\BoothSetting;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -81,6 +82,38 @@ class ManagementCrudTest extends TestCase
             'user_id' => $user->id,
             'type' => 'in',
             'amount' => 150000,
+        ]);
+    }
+
+    /**
+     * Admin can update booth settings.
+     */
+    public function test_admin_can_update_booth_settings(): void
+    {
+        $user = User::factory()->admin()->create();
+        BoothSetting::create([
+            'name' => 'Kasir Booth',
+            'address' => 'Area booth utama',
+            'city' => 'Makassar',
+            'phone' => '-',
+            'logo_path' => 'images/branding/booth-logo.svg',
+            'receipt_footer' => 'Terima kasih sudah belanja.',
+            'receipt_paper' => '80',
+        ]);
+
+        $response = $this->actingAs($user)->put(route('booth-settings.update'), [
+            'name' => 'Cemal Cemil Alma',
+            'address' => 'Jl. Yos Sudarso, Sarijaya, Palaran',
+            'city' => 'Kutai Kartanegara, Kaltim',
+            'phone' => '08123456789',
+            'receipt_footer' => 'Sampai jumpa lagi di booth kami.',
+            'receipt_paper' => '58',
+        ]);
+
+        $response->assertRedirect(route('booth-settings.edit'));
+        $this->assertDatabaseHas('booth_settings', [
+            'name' => 'Cemal Cemil Alma',
+            'receipt_paper' => '58',
         ]);
     }
 }

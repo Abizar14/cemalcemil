@@ -79,12 +79,19 @@ class CashierShiftController extends Controller
             ]);
         }
 
+        $summary = $this->buildShiftSummary($shift);
+
+        if (($summary['pending_qris_count'] ?? 0) > 0) {
+            return back()->withErrors([
+                'shift' => 'Shift belum bisa ditutup karena masih ada transaksi QRIS yang statusnya pending. Konfirmasi atau selesaikan dulu pembayaran QRIS tersebut.',
+            ]);
+        }
+
         $validated = $request->validate([
             'closing_cash_actual' => ['required', 'numeric', 'min:0'],
             'closing_notes' => ['nullable', 'string'],
         ]);
 
-        $summary = $this->buildShiftSummary($shift);
         $closingCashActual = (float) $validated['closing_cash_actual'];
         $closingCashExpected = $summary['expected_closing_cash'];
 
@@ -123,6 +130,48 @@ class CashierShiftController extends Controller
     }
 
     /**
+     * Update closing correction fields for a closed shift.
+     */
+    public function update(Request $request, CashierShift $shift): RedirectResponse
+    {
+        $user = $request->user();
+
+        if (! $user || ! $user->isAdmin()) {
+            abort(403);
+        }
+
+        if ($shift->status !== 'closed') {
+            return redirect()
+                ->route('shifts.show', $shift)
+                ->withErrors([
+                    'shift' => 'Koreksi shift hanya bisa dilakukan setelah shift ditutup.',
+                ]);
+        }
+
+        $validated = $request->validate([
+            'closing_cash_actual' => ['required', 'numeric', 'min:0'],
+            'opening_notes' => ['nullable', 'string'],
+            'closing_notes' => ['nullable', 'string'],
+        ]);
+
+        $summary = $this->buildShiftSummary($shift);
+        $closingCashActual = (float) $validated['closing_cash_actual'];
+        $closingCashExpected = $summary['expected_closing_cash'];
+
+        $shift->update([
+            'closing_cash_expected' => $closingCashExpected,
+            'closing_cash_actual' => $closingCashActual,
+            'cash_difference' => $closingCashActual - $closingCashExpected,
+            'opening_notes' => $validated['opening_notes'] ?? null,
+            'closing_notes' => $validated['closing_notes'] ?? null,
+        ]);
+
+        return redirect()
+            ->route('shifts.show', $shift)
+            ->with('status', 'Koreksi shift berhasil disimpan.');
+    }
+
+    /**
      * Build an operational recap for a shift.
      *
      * @return array<string, float|int>
@@ -138,6 +187,10 @@ class CashierShiftController extends Controller
             ->where('payment_method', 'qris')
             ->where('payment_status', 'pending')
             ->sum('total_amount');
+        $pendingQrisCount = $completedTransactions
+            ->where('payment_method', 'qris')
+            ->where('payment_status', 'pending')
+            ->count();
         $cashIn = (float) $shift->cashFlows->where('type', 'in')->sum('amount');
         $cashOut = (float) $shift->cashFlows->where('type', 'out')->sum('amount');
         $totalSales = $cashSales + $qrisSales;
@@ -149,6 +202,7 @@ class CashierShiftController extends Controller
             'cash_sales' => $cashSales,
             'qris_sales' => $qrisSales,
             'total_sales' => $totalSales,
+            'pending_qris_count' => $pendingQrisCount,
             'pending_qris' => $pendingQris,
             'cash_in' => $cashIn,
             'cash_out' => $cashOut,

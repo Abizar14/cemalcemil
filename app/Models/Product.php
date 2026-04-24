@@ -73,6 +73,18 @@ class Product extends Model
     }
 
     /**
+     * Determine whether the tracked stock is empty.
+     */
+    public function isOutOfStock(): bool
+    {
+        if (! $this->track_stock) {
+            return false;
+        }
+
+        return (int) ($this->stock_quantity ?? 0) <= 0;
+    }
+
+    /**
      * Get the full image URL for the product.
      */
     protected function imageUrl(): Attribute

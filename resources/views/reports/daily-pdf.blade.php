@@ -83,6 +83,7 @@
                     <tr>
                         <th>Kasir</th>
                         <th>Shift</th>
+                        <th>Modal Awal</th>
                         <th>Transaksi</th>
                         <th>Cash</th>
                         <th>QRIS</th>
@@ -95,6 +96,7 @@
                         <tr>
                             <td>{{ $row['shift']->user->name }}</td>
                             <td>{{ $row['shift']->opened_at->format('d M H:i') }}{{ $row['shift']->closed_at ? ' - '.$row['shift']->closed_at->format('d M H:i') : '' }}</td>
+                            <td>Rp{{ number_format($row['opening_cash'], 0, ',', '.') }}</td>
                             <td>{{ $row['transactions_count'] }}</td>
                             <td>Rp{{ number_format($row['cash_sales'], 0, ',', '.') }}</td>
                             <td>Rp{{ number_format($row['qris_sales'], 0, ',', '.') }}</td>
@@ -103,7 +105,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7">Belum ada data shift pada periode ini.</td>
+                            <td colspan="8">Belum ada data shift pada periode ini.</td>
                         </tr>
                     @endforelse
                 </tbody>

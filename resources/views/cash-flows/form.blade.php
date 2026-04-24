@@ -45,9 +45,9 @@
             id="amount"
             type="number"
             min="0"
-            step="0.01"
+            step="1"
             name="amount"
-            value="{{ old('amount', isset($cashFlow) ? number_format((float) $cashFlow->amount, 2, '.', '') : '') }}"
+            value="{{ old('amount', isset($cashFlow) ? (int) round((float) $cashFlow->amount) : '') }}"
             required
             class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
             placeholder="0"

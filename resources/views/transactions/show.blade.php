@@ -17,6 +17,12 @@
             {{ auth()->user()->isAdmin() ? 'Kembali ke Riwayat' : 'Kembali ke Kasir' }}
         </a>
         <a
+            href="{{ route('transactions.create') }}"
+            class="rounded-[1.5rem] border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+        >
+            Transaksi Baru
+        </a>
+        <a
             href="{{ route('transactions.print', $transaction) }}"
             class="font-display rounded-[1.5rem] bg-orange-500 px-5 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-orange-600"
         >

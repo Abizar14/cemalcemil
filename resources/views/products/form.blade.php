@@ -74,9 +74,9 @@
                 id="price"
                 type="number"
                 min="0"
-                step="0.01"
+                step="1"
                 name="price"
-                value="{{ old('price', isset($product) ? number_format((float) $product->price, 2, '.', '') : '') }}"
+                value="{{ old('price', isset($product) ? (int) round((float) $product->price) : '') }}"
                 required
                 class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
                 placeholder="0"
@@ -153,7 +153,7 @@
         </label>
 
         <div>
-            <label for="stock_quantity" class="mb-2 block text-sm font-medium text-slate-700">Jumlah stok</label>
+            <label for="stock_quantity" class="mb-2 block text-sm font-medium text-slate-700">Jumlah stok internal</label>
             <input
                 id="stock_quantity"
                 type="number"
@@ -164,13 +164,14 @@
                 class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
                 placeholder="Kosongkan jika tidak pakai stok"
             >
+            <p class="mt-2 text-sm text-slate-500">Nilai ini hanya dipakai internal sistem. Di tampilan admin/kasir akan disederhanakan menjadi Stok Ada atau Stok Habis.</p>
             @error('stock_quantity')
                 <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
             @enderror
         </div>
 
         <div>
-            <label for="stock_alert_threshold" class="mb-2 block text-sm font-medium text-slate-700">Batas stok menipis</label>
+            <label for="stock_alert_threshold" class="mb-2 block text-sm font-medium text-slate-700">Batas stok internal</label>
             <input
                 id="stock_alert_threshold"
                 type="number"
@@ -181,13 +182,14 @@
                 class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
                 placeholder="3"
             >
+            <p class="mt-2 text-sm text-slate-500">Opsional untuk penanda internal. Kalau stok sampai `0`, produk otomatis dianggap habis.</p>
             @error('stock_alert_threshold')
                 <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
             @enderror
         </div>
 
         <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/80 p-4 text-sm text-slate-600">
-            Jika stok diaktifkan dan jumlahnya `0`, produk akan otomatis nonaktif dari layar kasir.
+            Jika stok diaktifkan dan jumlahnya `0`, produk otomatis masuk status stok habis dan tidak tampil di layar kasir.
         </div>
     </div>
 

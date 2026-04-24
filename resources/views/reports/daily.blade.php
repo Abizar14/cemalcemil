@@ -250,7 +250,11 @@
                         </a>
                     </div>
 
-                    <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                    <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+                        <div class="rounded-[1.5rem] border border-slate-200/80 bg-slate-50 p-4">
+                            <p class="text-sm text-slate-500">Modal awal</p>
+                            <p class="font-display mt-2 text-xl font-semibold text-slate-900">Rp{{ number_format($row['opening_cash'], 0, ',', '.') }}</p>
+                        </div>
                         <div class="rounded-[1.5rem] border border-slate-200/80 bg-slate-50 p-4">
                             <p class="text-sm text-slate-500">Transaksi</p>
                             <p class="font-display mt-2 text-xl font-semibold text-slate-900">{{ $row['transactions_count'] }}</p>

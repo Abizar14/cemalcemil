@@ -60,7 +60,7 @@
 
                 <div id="product-grid" class="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
                     @foreach ($products as $product)
-                        <button type="button" data-product-card data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-price="{{ number_format((float) $product->price, 2, '.', '') }}" data-category-id="{{ $product->category_id }}" class="group rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-4 text-left transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50">
+                        <button type="button" data-product-card data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" data-product-price="{{ (int) round((float) $product->price) }}" data-category-id="{{ $product->category_id }}" class="group rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-4 text-left transition hover:-translate-y-0.5 hover:border-orange-200 hover:bg-orange-50">
                             <div class="flex items-start justify-between gap-3">
                                 <div>
                                     <p class="font-display text-lg font-semibold text-slate-900">{{ $product->name }}</p>
@@ -120,7 +120,7 @@
 
                 <div id="cash-payment-box" class="mt-5">
                     <label for="paid_amount" class="mb-2 block text-sm font-medium text-slate-700">Nominal dibayar</label>
-                    <input id="paid_amount" type="number" min="0" step="0.01" name="paid_amount" value="{{ old('paid_amount', number_format((float) ($transaction->paid_amount ?? 0), 2, '.', '')) }}" class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100" placeholder="Masukkan nominal bayar">
+                    <input id="paid_amount" type="number" min="0" step="1" name="paid_amount" value="{{ old('paid_amount', (int) round((float) ($transaction->paid_amount ?? 0))) }}" class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100" placeholder="Masukkan nominal bayar">
                     <p id="change-preview" class="mt-3 rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">Kembalian: Rp0</p>
                 </div>
 

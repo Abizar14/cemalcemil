@@ -231,6 +231,7 @@ class DailyReportController extends Controller
 
                 return [
                     'shift' => $shift,
+                    'opening_cash' => (float) $shift->opening_cash,
                     'cash_sales' => $cashSales,
                     'qris_sales' => $qrisSales,
                     'cash_in' => $cashIn,
