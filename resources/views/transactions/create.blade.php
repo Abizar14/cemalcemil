@@ -13,10 +13,14 @@
         'name' => $product->name,
         'price' => (float) $product->price,
         'category_id' => $product->category_id,
+        'menu_group' => $product->menu_group,
+        'selling_unit' => $product->selling_unit,
         'image_url' => $product->image_url,
         'track_stock' => (bool) $product->track_stock,
         'stock_quantity' => $product->stock_quantity,
     ])->values()->all();
+    $menuGroups = $products->pluck('menu_group')->filter()->unique()->sort()->values()->all();
+    $sellingUnits = $products->pluck('selling_unit')->filter()->unique()->sort()->values()->all();
 @endphp
 
 @extends('layouts.panel')
@@ -140,22 +144,27 @@
                     </a>
                 </div>
 
-                <div class="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-4">
+                <div class="mt-5 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+                    <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-5">
                         <p class="text-sm text-slate-500">Transaksi</p>
-                        <p class="font-display mt-2 text-2xl font-semibold text-slate-900">{{ $currentShiftSummary['transactions_count'] }}</p>
+                        <p class="font-display mt-3 text-3xl font-semibold text-slate-900">{{ $currentShiftSummary['transactions_count'] }}</p>
                     </div>
-                    <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-4">
+                    <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-5">
+                        <p class="text-sm text-slate-500">Total Penjualan</p>
+                        <p class="font-display mt-3 text-3xl font-semibold text-slate-900">Rp{{ number_format($currentShiftSummary['total_sales'], 0, ',', '.') }}</p>
+                    </div>
+                    <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-5">
                         <p class="text-sm text-slate-500">Penjualan Cash</p>
-                        <p class="font-display mt-2 text-2xl font-semibold text-emerald-700">Rp{{ number_format($currentShiftSummary['cash_sales'], 0, ',', '.') }}</p>
+                        <p class="font-display mt-3 text-3xl font-semibold text-emerald-700">Rp{{ number_format($currentShiftSummary['cash_sales'], 0, ',', '.') }}</p>
                     </div>
-                    <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-4">
+                    <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-5">
                         <p class="text-sm text-slate-500">Penjualan QRIS</p>
-                        <p class="font-display mt-2 text-2xl font-semibold text-sky-700">Rp{{ number_format($currentShiftSummary['qris_sales'], 0, ',', '.') }}</p>
+                        <p class="font-display mt-3 text-3xl font-semibold text-sky-700">Rp{{ number_format($currentShiftSummary['qris_sales'], 0, ',', '.') }}</p>
                     </div>
-                    <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-4">
+                    <div class="rounded-[1.5rem] border border-slate-200/80 bg-white/85 p-5 sm:col-span-2 2xl:col-span-1">
                         <p class="text-sm text-slate-500">Estimasi Tutup</p>
-                        <p class="font-display mt-2 text-2xl font-semibold text-slate-900">Rp{{ number_format($currentShiftSummary['expected_closing_cash'], 0, ',', '.') }}</p>
+                        <p class="font-display mt-3 text-3xl font-semibold text-slate-900">Rp{{ number_format($currentShiftSummary['expected_closing_cash'], 0, ',', '.') }}</p>
+                        <p class="mt-2 text-xs leading-5 text-slate-500">Modal awal + cash sales + kas masuk - kas keluar.</p>
                     </div>
                 </div>
             </article>
@@ -209,13 +218,13 @@
             @csrf
 
             <section class="space-y-6 xl:min-h-0">
-                <div class="mesh-panel shadow-panel animate-rise rounded-[1.75rem] border border-white/70 p-5 sm:p-6 xl:flex xl:max-h-[calc(100vh-14rem)] xl:min-h-0 xl:flex-col xl:overflow-hidden">
+                <div class="mesh-panel shadow-panel animate-rise rounded-[1.75rem] border border-white/70 p-5 sm:p-6 xl:flex xl:max-h-[calc(140vh-14rem)] xl:min-h-0 xl:flex-col xl:overflow-hidden">
                     <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
                             <p class="text-sm font-medium tracking-[0.2em] text-slate-500 uppercase">Katalog Produk</p>
                             <h2 class="font-display mt-2 text-2xl font-semibold text-slate-900">Pilih menu booth</h2>
                         </div>
-                        <div class="grid gap-3 sm:grid-cols-2">
+                        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                             <input
                                 id="product-search"
                                 type="text"
@@ -231,11 +240,40 @@
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                                 @endforeach
                             </select>
+                            <select
+                                id="group-filter"
+                                class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+                            >
+                                <option value="">All produk</option>
+                                @foreach ($menuGroups as $group)
+                                    <option value="{{ $group }}">{{ $group }}</option>
+                                @endforeach
+                            </select>
+                            <select
+                                id="unit-filter"
+                                class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+                            >
+                                <option value="">Semua satuan</option>
+                                @foreach ($sellingUnits as $unit)
+                                    <option value="{{ $unit }}">{{ $unit }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
 
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <button type="button" data-group-chip="" class="group-chip rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white">
+                            All Produk
+                        </button>
+                        @foreach ($menuGroups as $group)
+                            <button type="button" data-group-chip="{{ $group }}" class="group-chip rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                                {{ $group }}
+                            </button>
+                        @endforeach
+                    </div>
+
                     <div id="product-grid" class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:min-h-0 xl:flex-1 xl:auto-rows-max xl:grid-cols-4 xl:content-start xl:overflow-y-auto xl:pr-2">
-                        @foreach ($products as $product)
+                        @forelse ($products as $product)
                             <button
                                 type="button"
                                 data-product-card
@@ -243,6 +281,8 @@
                                 data-product-name="{{ $product->name }}"
                                 data-product-price="{{ number_format((float) $product->price, 2, '.', '') }}"
                                 data-category-id="{{ $product->category_id }}"
+                                data-menu-group="{{ $product->menu_group }}"
+                                data-selling-unit="{{ $product->selling_unit }}"
                                 class="group overflow-hidden rounded-[1.7rem] border border-slate-200/80 bg-white/90 text-left transition hover:-translate-y-1 hover:border-orange-200 hover:bg-orange-50"
                             >
                                 <div class="relative aspect-[4/3] overflow-hidden bg-slate-100">
@@ -260,12 +300,26 @@
                                 </div>
                                 <div class="p-4">
                                     <div class="flex items-start justify-between gap-3">
-                                        <p class="font-display text-lg font-semibold text-slate-900">{{ $product->name }}</p>
-                                        @if ($product->track_stock)
-                                            <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $product->isLowStock() ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
-                                                Stok {{ $product->stock_quantity }}
-                                            </span>
-                                        @endif
+                                        <div>
+                                            <p class="font-display text-lg font-semibold text-slate-900">{{ $product->name }}</p>
+                                            <div class="mt-2 flex flex-wrap gap-2">
+                                                @if ($product->menu_group)
+                                                    <span class="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
+                                                        {{ $product->menu_group }}
+                                                    </span>
+                                                @endif
+                                                @if ($product->selling_unit)
+                                                    <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                                                        {{ $product->selling_unit }}
+                                                    </span>
+                                                @endif
+                                                @if ($product->track_stock)
+                                                    <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $product->isLowStock() ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700' }}">
+                                                        Stok {{ $product->stock_quantity }}
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                     <p class="mt-2 text-sm text-slate-500">Tap kartu untuk menambahkan ke keranjang.</p>
                                     <p class="font-display mt-4 text-2xl font-semibold text-orange-600">
@@ -273,12 +327,20 @@
                                     </p>
                                 </div>
                             </button>
-                        @endforeach
+                        @empty
+                            <div class="col-span-full rounded-[1.75rem] border border-dashed border-slate-300 bg-white/80 px-5 py-12 text-center">
+                                <p class="font-display text-xl font-semibold text-slate-900">Produk aktif belum ada</p>
+                                <p class="mt-3 text-sm leading-6 text-slate-500">
+                                    Biasanya ini terjadi karena data produk belum di-seed, belum dibuat di menu admin,
+                                    atau semua produk sedang nonaktif.
+                                </p>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
             </section>
 
-            <aside class="space-y-6 xl:sticky xl:top-6 xl:max-h-[calc(100vh-3rem)] xl:self-start xl:overflow-y-auto xl:pr-1" id="payment-section">
+            <aside class="space-y-6 xl:sticky xl:top-6 xl:max-h-[calc(140vh-3rem)] xl:self-start xl:overflow-y-auto xl:pr-1" id="payment-section">
                 <section class="mesh-panel shadow-panel animate-rise rounded-[1.75rem] border border-white/70 p-5 sm:p-6" style="animation-delay: 0.05s;">
                     <div class="flex items-center justify-between gap-4">
                         <div>
@@ -424,6 +486,9 @@
                 const productGrid = document.getElementById('product-grid');
                 const productSearch = document.getElementById('product-search');
                 const categoryFilter = document.getElementById('category-filter');
+                const groupFilter = document.getElementById('group-filter');
+                const unitFilter = document.getElementById('unit-filter');
+                const groupChips = document.querySelectorAll('[data-group-chip]');
                 const cartItems = document.getElementById('cart-items');
                 const cartEmpty = document.getElementById('cart-empty');
                 const cartCount = document.getElementById('cart-count');
@@ -443,6 +508,18 @@
                 const submitHelperText = document.getElementById('submit-helper-text');
 
                 const findProduct = (productId) => productData.find((product) => product.id === productId);
+
+                const syncGroupChipState = () => {
+                    groupChips.forEach((chip) => {
+                        const isActive = chip.dataset.groupChip === groupFilter.value;
+                        chip.classList.toggle('bg-slate-900', isActive);
+                        chip.classList.toggle('text-white', isActive);
+                        chip.classList.toggle('border', !isActive);
+                        chip.classList.toggle('border-slate-200', !isActive);
+                        chip.classList.toggle('bg-white', !isActive);
+                        chip.classList.toggle('text-slate-600', !isActive);
+                    });
+                };
 
                 const renderCart = () => {
                     cartItems.innerHTML = '';
@@ -606,15 +683,23 @@
                 const filterProducts = () => {
                     const searchTerm = productSearch.value.trim().toLowerCase();
                     const selectedCategory = categoryFilter.value;
+                    const selectedGroup = groupFilter.value;
+                    const selectedUnit = unitFilter.value;
 
                     productGrid.querySelectorAll('[data-product-card]').forEach((card) => {
                         const name = card.dataset.productName.toLowerCase();
                         const categoryId = card.dataset.categoryId;
+                        const menuGroup = card.dataset.menuGroup;
+                        const sellingUnit = card.dataset.sellingUnit;
                         const matchesSearch = name.includes(searchTerm);
                         const matchesCategory = selectedCategory === '' || categoryId === selectedCategory;
+                        const matchesGroup = selectedGroup === '' || menuGroup === selectedGroup;
+                        const matchesUnit = selectedUnit === '' || sellingUnit === selectedUnit;
 
-                        card.classList.toggle('hidden', !matchesSearch || !matchesCategory);
+                        card.classList.toggle('hidden', !matchesSearch || !matchesCategory || !matchesGroup || !matchesUnit);
                     });
+
+                    syncGroupChipState();
                 };
 
                 productGrid.addEventListener('click', (event) => {
@@ -654,8 +739,16 @@
                 resetCartButton.addEventListener('click', resetCart);
                 productSearch.addEventListener('input', filterProducts);
                 categoryFilter.addEventListener('change', filterProducts);
+                groupFilter.addEventListener('change', filterProducts);
+                unitFilter.addEventListener('change', filterProducts);
                 paidAmountInput.addEventListener('input', updateChangePreview);
                 paymentRadios.forEach((radio) => radio.addEventListener('change', syncPaymentMode));
+                groupChips.forEach((chip) => {
+                    chip.addEventListener('click', () => {
+                        groupFilter.value = chip.dataset.groupChip;
+                        filterProducts();
+                    });
+                });
 
                 document.addEventListener('keydown', (event) => {
                     if (event.key === '/' && document.activeElement !== productSearch) {
@@ -688,4 +781,3 @@
         </script>
     @endif
 @endsection
-
