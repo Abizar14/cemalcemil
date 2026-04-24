@@ -44,7 +44,9 @@ class ManagementCrudTest extends TestCase
         $response = $this->actingAs($user)->post(route('products.store'), [
             'category_id' => $category->id,
             'name' => 'Thai Tea',
+            'menu_group' => 'Es',
             'price' => 12000,
+            'selling_unit' => 'Gelas',
             'is_active' => 1,
         ]);
 
@@ -53,6 +55,8 @@ class ManagementCrudTest extends TestCase
         $this->assertDatabaseHas('products', [
             'name' => 'Thai Tea',
             'category_id' => $category->id,
+            'menu_group' => 'Es',
+            'selling_unit' => 'Gelas',
         ]);
     }
 

@@ -37,22 +37,54 @@
         @enderror
     </div>
 
-    <div>
-        <label for="price" class="mb-2 block text-sm font-medium text-slate-700">Harga</label>
-        <input
-            id="price"
-            type="number"
-            min="0"
-            step="0.01"
-            name="price"
-            value="{{ old('price', isset($product) ? number_format((float) $product->price, 2, '.', '') : '') }}"
-            required
-            class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
-            placeholder="0"
-        >
-        @error('price')
-            <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
-        @enderror
+    <div class="grid gap-4 lg:grid-cols-3">
+        <div>
+            <label for="menu_group" class="mb-2 block text-sm font-medium text-slate-700">Kelompok menu</label>
+            <input
+                id="menu_group"
+                type="text"
+                name="menu_group"
+                value="{{ old('menu_group', $product->menu_group ?? '') }}"
+                class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+                placeholder="Contoh: Pisang, Es, Pentol"
+            >
+            @error('menu_group')
+                <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            <label for="selling_unit" class="mb-2 block text-sm font-medium text-slate-700">Satuan jual</label>
+            <input
+                id="selling_unit"
+                type="text"
+                name="selling_unit"
+                value="{{ old('selling_unit', $product->selling_unit ?? '') }}"
+                class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+                placeholder="Contoh: Porsi, Gelas, Satuan"
+            >
+            @error('selling_unit')
+                <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            <label for="price" class="mb-2 block text-sm font-medium text-slate-700">Harga</label>
+            <input
+                id="price"
+                type="number"
+                min="0"
+                step="0.01"
+                name="price"
+                value="{{ old('price', isset($product) ? number_format((float) $product->price, 2, '.', '') : '') }}"
+                required
+                class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+                placeholder="0"
+            >
+            @error('price')
+                <p class="mt-2 text-sm text-rose-600">{{ $message }}</p>
+            @enderror
+        </div>
     </div>
 
     <div class="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
@@ -95,6 +127,12 @@
             </div>
             <div class="mt-4">
                 <p class="font-display text-xl font-semibold text-slate-900">{{ old('name', $product->name ?? 'Nama menu') }}</p>
+                <p class="mt-2 text-sm text-slate-500">
+                    {{ old('menu_group', $product->menu_group ?? 'Kelompok menu') }}
+                    @if (old('selling_unit', $product->selling_unit ?? ''))
+                        | {{ old('selling_unit', $product->selling_unit ?? '') }}
+                    @endif
+                </p>
                 <p class="mt-2 text-sm text-slate-500">
                     {{ old('price') !== null || isset($product) ? 'Rp'.number_format((float) old('price', $product->price ?? 0), 0, ',', '.') : 'Harga akan tampil di sini' }}
                 </p>

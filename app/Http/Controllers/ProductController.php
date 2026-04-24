@@ -20,6 +20,8 @@ class ProductController extends Controller
         $search = trim((string) $request->string('search'));
         $status = (string) $request->string('status');
         $categoryId = (int) $request->integer('category_id');
+        $menuGroup = trim((string) $request->string('menu_group'));
+        $sellingUnit = trim((string) $request->string('selling_unit'));
 
         $products = Product::query()
             ->with('category')
@@ -32,6 +34,12 @@ class ProductController extends Controller
             ->when($categoryId > 0, function ($query) use ($categoryId) {
                 $query->where('category_id', $categoryId);
             })
+            ->when($menuGroup !== '', function ($query) use ($menuGroup) {
+                $query->where('menu_group', $menuGroup);
+            })
+            ->when($sellingUnit !== '', function ($query) use ($sellingUnit) {
+                $query->where('selling_unit', $sellingUnit);
+            })
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -39,9 +47,13 @@ class ProductController extends Controller
         return view('products.index', [
             'products' => $products,
             'categories' => Category::query()->orderBy('name')->get(),
+            'menuGroups' => Product::query()->whereNotNull('menu_group')->where('menu_group', '!=', '')->select('menu_group')->distinct()->orderBy('menu_group')->pluck('menu_group'),
+            'sellingUnits' => Product::query()->whereNotNull('selling_unit')->where('selling_unit', '!=', '')->select('selling_unit')->distinct()->orderBy('selling_unit')->pluck('selling_unit'),
             'search' => $search,
             'status' => $status,
             'categoryId' => $categoryId,
+            'menuGroup' => $menuGroup,
+            'sellingUnit' => $sellingUnit,
         ]);
     }
 
@@ -63,7 +75,9 @@ class ProductController extends Controller
         $validated = $request->validate([
             'category_id' => ['required', 'exists:categories,id'],
             'name' => ['required', 'string', 'max:255', 'unique:products,name'],
+            'menu_group' => ['nullable', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
+            'selling_unit' => ['nullable', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'max:2048'],
             'track_stock' => ['nullable', 'boolean'],
             'stock_quantity' => ['nullable', 'integer', 'min:0'],
@@ -72,6 +86,12 @@ class ProductController extends Controller
         ]);
 
         $validated['track_stock'] = $request->boolean('track_stock');
+        $validated['menu_group'] = $validated['menu_group'] !== null && trim($validated['menu_group']) !== ''
+            ? trim($validated['menu_group'])
+            : null;
+        $validated['selling_unit'] = $validated['selling_unit'] !== null && trim($validated['selling_unit']) !== ''
+            ? trim($validated['selling_unit'])
+            : null;
         $validated['stock_quantity'] = $validated['track_stock']
             ? (int) ($validated['stock_quantity'] ?? 0)
             : null;
@@ -111,7 +131,9 @@ class ProductController extends Controller
         $validated = $request->validate([
             'category_id' => ['required', 'exists:categories,id'],
             'name' => ['required', 'string', 'max:255', 'unique:products,name,'.$product->id],
+            'menu_group' => ['nullable', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
+            'selling_unit' => ['nullable', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'max:2048'],
             'remove_image' => ['nullable', 'boolean'],
             'track_stock' => ['nullable', 'boolean'],
@@ -121,6 +143,12 @@ class ProductController extends Controller
         ]);
 
         $validated['track_stock'] = $request->boolean('track_stock');
+        $validated['menu_group'] = $validated['menu_group'] !== null && trim($validated['menu_group']) !== ''
+            ? trim($validated['menu_group'])
+            : null;
+        $validated['selling_unit'] = $validated['selling_unit'] !== null && trim($validated['selling_unit']) !== ''
+            ? trim($validated['selling_unit'])
+            : null;
         $validated['stock_quantity'] = $validated['track_stock']
             ? (int) ($validated['stock_quantity'] ?? 0)
             : null;

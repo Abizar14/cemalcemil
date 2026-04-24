@@ -21,7 +21,7 @@
 
 @section('panel-content')
     <section class="mesh-panel shadow-panel animate-rise rounded-[1.75rem] border border-white/70 p-5 sm:p-6">
-        <form method="GET" action="{{ route('products.index') }}" class="grid gap-4 xl:grid-cols-[1.1fr_0.8fr_0.8fr_auto]">
+        <form method="GET" action="{{ route('products.index') }}" class="grid gap-4 xl:grid-cols-[1.1fr_0.8fr_0.8fr_0.8fr_0.8fr_auto]">
             <div>
                 <label for="search" class="mb-2 block text-sm font-medium text-slate-700">Cari produk</label>
                 <input
@@ -58,6 +58,34 @@
                     <option value="">Semua status</option>
                     <option value="active" @selected($status === 'active')>Aktif</option>
                     <option value="inactive" @selected($status === 'inactive')>Nonaktif</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="menu_group" class="mb-2 block text-sm font-medium text-slate-700">Kelompok menu</label>
+                <select
+                    id="menu_group"
+                    name="menu_group"
+                    class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+                >
+                    <option value="">Semua kelompok</option>
+                    @foreach ($menuGroups as $groupOption)
+                        <option value="{{ $groupOption }}" @selected($menuGroup === $groupOption)>{{ $groupOption }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label for="selling_unit" class="mb-2 block text-sm font-medium text-slate-700">Satuan jual</label>
+                <select
+                    id="selling_unit"
+                    name="selling_unit"
+                    class="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3.5 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+                >
+                    <option value="">Semua satuan</option>
+                    @foreach ($sellingUnits as $unitOption)
+                        <option value="{{ $unitOption }}" @selected($sellingUnit === $unitOption)>{{ $unitOption }}</option>
+                    @endforeach
                 </select>
             </div>
 
@@ -108,6 +136,16 @@
                                     <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                                         {{ $product->category->name }}
                                     </span>
+                                    @if ($product->menu_group)
+                                        <span class="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-700">
+                                            {{ $product->menu_group }}
+                                        </span>
+                                    @endif
+                                    @if ($product->selling_unit)
+                                        <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">
+                                            {{ $product->selling_unit }}
+                                        </span>
+                                    @endif
                                     <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $product->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600' }}">
                                         {{ $product->is_active ? 'Aktif' : 'Nonaktif' }}
                                     </span>
